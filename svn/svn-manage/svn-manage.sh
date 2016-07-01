@@ -4,19 +4,19 @@
 # 2016-06-18
 
 #
-# 1.create branch;
+# 1.create branch
 # 2.merge
 #
 
-echo "svn_manage"
+echo "svn-manage"
 echo ""
 
 # config
 svn_username='svn_username'
 svn_password='svn_password'
-repo_path='svn://192.168.0.77/repos/myrepo'
-trunk_dir_name='Trunk'
-branch_dir_name='Branches'
+repo_path='svn://192.168.0.77/repos/mc'
+trunk_dir_name='trunk'
+branch_dir_name='branches'
 
 # color
 color_reset='\033[0m'
@@ -99,21 +99,21 @@ case "${sub_command}" in
         case "${2}" in
             "branch")
                 echo "
-                svn_manage.sh branch project 2016.07.07.1/project
+                svn_manage.sh branch project 2016.07.01.22.36.05/project
                 --- create branch ---
                 project_name: project
-                branch_name:  2016.07.07.1/project
-                source_url:      svn://192.168.0.77/repos/myrepo/Trunk/project
-                destination_url: svn://192.168.0.77/repos/myrepo/Branches/2016.07.07.1/project
+                branch_name:  2016.07.01.22.36.05/project
+                source_url:      svn://192.168.0.77/repos/mc/trunk/project
+                destination_url: svn://192.168.0.77/repos/mc/branches/2016.07.01.22.36.05/project
                 are you sure? [y/n]: y
                 success
                 "
                 ;;
             "merge")
                 echo "
-                svn_manage.sh merge svn://192.168.0.77/repos/myrepo/Branches/2016.07.07.1/project /home/html/project
+                svn_manage.sh merge svn://192.168.0.77/repos/mc/branches/2016.07.01.22.36.05/project /home/html/project
                 --- merge ---
-                source_url: svn://192.168.0.77/repos/myrepo/Branches/2016.07.07.1/project
+                source_url: svn://192.168.0.77/repos/mc/branches/2016.07.01.22.36.05/project
                 work_copy_path: /home/html/project
                 start_rev: r1991
                 are you sure? [y/n]: y
