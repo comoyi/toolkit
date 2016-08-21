@@ -1,0 +1,15 @@
+
+set mouse="" "禁用鼠标
+set wrap "内容过长换行
+set relativenumber "默认显示相对行号
+"set noexpandtab "turn off expandtab
+set listchars=tab:›\ ,trail:.,extends:#,nbsp:. " Highlight problematic whitespace
+set autoread  "when file modified by other autoread it
+let NERDTreeWinPos="right" "let NERDTree on the right side
+autocmd InsertEnter * :set number "插入模式显示普通行号
+autocmd InsertLeave * :set relativenumber "普通模式显示相对行号
+
+"ctrlp config
+let g:ctrlp_max_files=1000000 "搜索文件个数限制
+let g:ctrlp_max_height=30 "显示记录的条数
+
