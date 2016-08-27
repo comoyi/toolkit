@@ -33,7 +33,7 @@ project_michael='work-michael'
 function init_project_template()
 {
     # work path
-    local work_path='/home/vagrant/code/template'
+    local work_path='/home/vagrant/mydata/code/template'
     cd ${work_path}
 
     local cmd_debug_log='touch /tmp/debug_`date +%Y%m%d`.log && chown nobody:nobody /tmp/debug_`date +%Y%m%d`.log && tail -f /tmp/debug_`date +%Y%m%d`.log'
@@ -81,7 +81,7 @@ function init_project_template()
 function init_project_michael()
 {
     # work path
-    local work_path='/home/vagrant/code/michael'
+    local work_path='/home/vagrant/mydata/code/michael'
     cd ${work_path}
 
     local cmd_debug_log='touch /tmp/debug_`date +%Y%m%d`.log && chown nobody:nobody /tmp/debug_`date +%Y%m%d`.log && tail -f /tmp/debug_`date +%Y%m%d`.log'
