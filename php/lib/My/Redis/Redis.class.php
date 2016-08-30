@@ -27,10 +27,30 @@ class Redis {
      * 构造函数
      */
     public function __construct($config = []){
-        $redisSentinel = [
-            'redis_password' => 'redispassword',
-            'redis_master_name' => 'mastername',
-            'redis_sentinel' => [
+
+        $defaultConfig = [
+            'type' => 'direct', // direct: 直连, sentinel: 由sentinel决定host与port
+            'password' => 'redispassword', // redis auth 密码
+            'master_name' => 'mastername', // master name
+            'direct' => [
+                'masters' => [
+                    [
+                        'host' => '127.0.0.1',
+                        'port' => '6379'
+                    ]
+                ],
+                'slaves' => [
+                    [
+                        'host' => '127.0.0.1',
+                        'port' => '6381'
+                    ],
+                    [
+                        'host' => '127.0.0.1',
+                        'port' => '6382'
+                    ]
+                ],
+            ],
+            'sentinel' => [
                 'sentinels' => [
                     [
                         'host' => '127.0.0.1',
@@ -41,21 +61,71 @@ class Redis {
                         'port' => '5001'
                     ]
                 ]
+                
             ]
-        ]
-        $defaultConfig = ['redis_password' => $redisSentinel['redis_password'], 'redis_master_name' => $redisSentinel['redis_master_name'], 'redis_sentinel' => $redisSentinel['redis_sentinel']];
+        ];
+
         $this->setConfig($defaultConfig);
         $this->setConfig($config);
-        $this->sentinel = new RedisSentinel(); //创建sentinel
 
-        /* 根据配置添加sentinel */
-        foreach ($this->configs['redis_sentinel']['sentinels'] as $s) {
-            $this->sentinel->addnode($s['host'], $s['port']);
+        $this->masterName = $this->configs['master_name'];
+        $masterConfigs = [];
+        $slaveConfigs = [];
+        if('sentinel' === $this->configs['type']){ // sentinel方式
+            $this->sentinel = new RedisSentinel(); //创建sentinel
+
+            /* 根据配置添加sentinel */
+            foreach ($this->configs['sentinel']['sentinels'] as $s) {
+                $this->sentinel->addnode($s['host'], $s['port']);
+            }
+
+            $masterConfigs = $this->getMasterConfigs($this->sentinel, $this->masterName);
+            $slaveConfigs = $this->getSlaveConfigs($this->sentinel, $this->masterName);
+        }else{ // 直连方式
+            $randomMaster = rand(0, (count($this->configs['direct']['masters']) - 1)); // 随机取一个master的配置
+            $masterConfigs = [
+                'host' => $this->configs['direct']['masters'][$randomMaster]['host'],
+                'port' => $this->configs['direct']['masters'][$randomMaster]['port'],
+                'password' = $this->configs['password']
+            ];
+
+            $randomSlave = rand(0, (count($this->configs['direct']['slaves']) - 1)); // 随机取一个slave的配置
+            $slaveConfigs = [
+                'host' => $this->configs['direct']['slaves'][$randomSlave]['host'],
+                'port' => $this->configs['direct']['slaves'][$randomSlave]['port'],
+                'password' = $this->configs['password']
+            ];
         }
 
-        $this->masterName = $this->configs['redis_master_name'];
-        $this->pool['master'] = new RedisMaster(['redis_password' => $this->configs['redis_password']], $this->sentinel, $this->masterName);
-        $this->pool['slave'] = new RedisSlave(['redis_password' => $this->configs['redis_password']], $this->sentinel, $this->masterName);
+        $this->pool['master'] = new RedisMaster($masterConfigs);
+        $this->pool['slave'] = new RedisSlave($slaveConfigs);
+    }
+
+    /**
+     * 获取配置
+     */
+    public function getMasterConfigs($sentinel, $masterName){
+        $masters = $sentinel->get_masters($masterName);
+        $config = [
+            'host' => $masters[0],
+            'port' => $masters[1],
+            'password' => $this->configs['password']
+        ];
+        return $config;
+    }
+
+    /**
+     * 获取配置
+     */
+    public function getSlaveConfigs($sentinel, $masterName){
+        $slaves = $sentinel->get_slaves($masterName);
+        $random = rand(0, (count($slaves) - 1)); //随机取一个slave的配置
+        $config = [
+            'host' => $slaves[$random]['ip'],
+            'port' => $slaves[$random]['port']
+            'password' => $this->configs['password']
+        ];
+        return $config;
     }
 
     /**
@@ -63,7 +133,6 @@ class Redis {
      */
     private function setConfig($config) {
         $this->configs = array_merge($this->configs, $config);
-        //file_put_contents('/tmp/debug_'.date('Ymd').'.log', '[line: ' . __LINE__ . ']' . '[$this->configs]' . var_export($this->configs, true) . PHP_EOL, FILE_APPEND);
     }
 
     /**
@@ -83,6 +152,14 @@ class Redis {
             $masterOrSlave = 'slave';
        }
        return $masterOrSlave;
+    }
+
+    /**
+     * 切换database
+     */
+    private function select($index = 0) {
+        $this->pool['master']->getHandler()->select($index);
+        $this->pool['slave']->getHandler()->select($index);
     }
 
     /**
