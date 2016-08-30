@@ -59,7 +59,7 @@ function init_project_template()
 
     # mysql
     ${tmux} new-window -d -n mysql -t ${project_template}
-    ${tmux} send-keys -t "${project_template}:mysql" "${mysql} -h${mysql_host} -u${mysql_user} -p${mysql_password} call" C-m
+    ${tmux} send-keys -t "${project_template}:mysql" "${mysql} -h${mysql_host} -u${mysql_user} -p${mysql_password}" C-m
 
     # redis
     ${tmux} new-window -d -n redis -t ${project_template}
@@ -107,7 +107,7 @@ function init_project_michael()
 
     # mysql
     ${tmux} new-window -d -n mysql -t ${project_michael}
-    ${tmux} send-keys -t "${project_michael}:mysql" "${mysql} -h${mysql_host} -u${mysql_user} -p${mysql_password} call" C-m
+    ${tmux} send-keys -t "${project_michael}:mysql" "${mysql} -h${mysql_host} -u${mysql_user} -p${mysql_password}" C-m
 
     # redis
     ${tmux} new-window -d -n redis -t ${project_michael}
