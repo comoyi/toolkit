@@ -6,7 +6,7 @@ class RedisSentinel {
     private $handle;
     private $nodes;
 
-    public function  __construct(){
+    public function __construct(){
         $this->handle = false;
         $this->nodes = array();
     }
@@ -27,7 +27,7 @@ class RedisSentinel {
                 return $this->handle; 
             }
         }
-        return false; 
+        return false;
     }
 
     //执行命令
@@ -37,7 +37,7 @@ class RedisSentinel {
         if ( is_array($commands) ){    $commands = implode("\r\n", $commands);}
         $command = $commands . "\r\n";
         for ( $written = 0; $written < strlen($command); $written += $fwrite ){
-            if ( !$fwrite = fwrite($this->handle, substr($command, $written)) )    {return false;}
+            if ( !$fwrite = fwrite($this->handle, substr($command, $written)) ) {return false;}
         }
         return true;
     }
@@ -81,14 +81,13 @@ class RedisSentinel {
         $col = intval(substr(trim(fgets($handle)), 1));
         if(feof($handle)) return false;
 
-        for($i=0; $i < $col; $i++){    
-                $len = intval(substr(trim(fgets($handle)), 1));
-                if(feof($handle)) break;
+        for($i=0; $i < $col; $i++){
+            $len = intval(substr(trim(fgets($handle)), 1));
+            if(feof($handle)) break;
 
-                $value = substr(trim(fgets($handle)), 0, $len);
-                $sentinels[$i] = $value;
-                if(feof($handle)) break;
-
+            $value = substr(trim(fgets($handle)), 0, $len);
+            $sentinels[$i] = $value;
+            if(feof($handle)) break;
         }
         return $sentinels;
     }
