@@ -209,8 +209,16 @@ class Redis {
     /**
      * 同redis手册
      */
-    public function set($key){
-        $result= $this->getHandler($this->judge(__FUNCTION__))->set($key);
+    public function set($key, $value){
+        $result= $this->getHandler($this->judge(__FUNCTION__))->set($key, $value);
+        return $result;
+    }
+
+    /**
+     * 同redis手册
+     */
+    public function setex($key, $seconds, $value){
+        $result= $this->getHandler($this->judge(__FUNCTION__))->setex($key, $seconds, $value);
         return $result;
     }
 
