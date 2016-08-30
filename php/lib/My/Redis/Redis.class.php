@@ -31,7 +31,7 @@ class Redis {
         $defaultConfig = [
             'type' => 'direct', // direct: 直连, sentinel: 由sentinel决定host与port
             'password' => 'redispassword', // redis auth 密码
-            'master_name' => 'mastername', // master name
+            'master_name' => 'mymaster', // master name
             'direct' => [
                 'masters' => [
                     [
