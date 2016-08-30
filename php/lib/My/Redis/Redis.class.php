@@ -61,7 +61,6 @@ class Redis {
                         'port' => '5001'
                     ]
                 ]
-                
             ]
         ];
 
@@ -94,7 +93,7 @@ class Redis {
         $config = [
             'host' => $this->configs['direct']['masters'][$randomMaster]['host'],
             'port' => $this->configs['direct']['masters'][$randomMaster]['port'],
-            'password' = $this->configs['password']
+            'password' => $this->configs['password']
         ];
         return $config;
     }
@@ -113,7 +112,7 @@ class Redis {
         $config = [
             'host' => $this->configs['direct']['slaves'][$randomSlave]['host'],
             'port' => $this->configs['direct']['slaves'][$randomSlave]['port'],
-            'password' = $this->configs['password']
+            'password' => $this->configs['password']
         ];
         return $config;
     }
@@ -142,7 +141,7 @@ class Redis {
         $random = rand(0, (count($slaves) - 1)); // 随机取一个slave的配置
         $config = [
             'host' => $slaves[$random]['ip'],
-            'port' => $slaves[$random]['port']
+            'port' => $slaves[$random]['port'],
             'password' => $this->configs['password']
         ];
         return $config;
@@ -205,7 +204,7 @@ class Redis {
         $result= $this->getHandler($this->judge(__FUNCTION__))->hget($key, $field);
         return $result;
     }
- 
+
     /**
      * 同redis手册
      */
