@@ -24,7 +24,7 @@ class RedisSentinel {
             for($i=0; $i < count($this->nodes); $i++){
                 if (!$sock = fsockopen($this->nodes[$i]['host'], $this->nodes[$i]['port'], $errno, $errstr)) {continue;}
                 $this->handle = $sock;
-                return $this->handle; 
+                return $this->handle;
             }
         }
         return false;
@@ -34,7 +34,7 @@ class RedisSentinel {
     public function command($commands){
         $this->connection();
         if ( !$this->handle ) {return false;}
-        if ( is_array($commands) ){    $commands = implode("\r\n", $commands);}
+        if ( is_array($commands) ){$commands = implode("\r\n", $commands);}
         $command = $commands . "\r\n";
         for ( $written = 0; $written < strlen($command); $written += $fwrite ){
             if ( !$fwrite = fwrite($this->handle, substr($command, $written)) ) {return false;}

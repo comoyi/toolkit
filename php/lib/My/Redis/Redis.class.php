@@ -69,8 +69,7 @@ class Redis {
         $this->setConfig($config);
 
         $this->masterName = $this->configs['master_name'];
-        $masterConfigs = [];
-        $slaveConfigs = [];
+
         if('sentinel' === $this->configs['type']){ // sentinel方式
             $this->sentinel = new RedisSentinel(); //创建sentinel
 
@@ -78,34 +77,52 @@ class Redis {
             foreach ($this->configs['sentinel']['sentinels'] as $s) {
                 $this->sentinel->addnode($s['host'], $s['port']);
             }
-
-            $masterConfigs = $this->getMasterConfigs($this->sentinel, $this->masterName);
-            $slaveConfigs = $this->getSlaveConfigs($this->sentinel, $this->masterName);
-        }else{ // 直连方式
-            $randomMaster = rand(0, (count($this->configs['direct']['masters']) - 1)); // 随机取一个master的配置
-            $masterConfigs = [
-                'host' => $this->configs['direct']['masters'][$randomMaster]['host'],
-                'port' => $this->configs['direct']['masters'][$randomMaster]['port'],
-                'password' = $this->configs['password']
-            ];
-
-            $randomSlave = rand(0, (count($this->configs['direct']['slaves']) - 1)); // 随机取一个slave的配置
-            $slaveConfigs = [
-                'host' => $this->configs['direct']['slaves'][$randomSlave]['host'],
-                'port' => $this->configs['direct']['slaves'][$randomSlave]['port'],
-                'password' = $this->configs['password']
-            ];
         }
 
-        $this->pool['master'] = new RedisMaster($masterConfigs);
-        $this->pool['slave'] = new RedisSlave($slaveConfigs);
+        $this->pool['master'] = new RedisMaster($this->getMasterConfigs());
+        $this->pool['slave'] = new RedisSlave($this->getSlaveConfigs());
     }
 
     /**
-     * 获取配置
+     * 获取master配置
      */
-    public function getMasterConfigs($sentinel, $masterName){
-        $masters = $sentinel->get_masters($masterName);
+    public function getMasterConfigs(){
+        if('sentinel' === $this->configs['type']){
+            return $this->getMasterConfigsBySentinel();
+        }
+        $randomMaster = rand(0, (count($this->configs['direct']['masters']) - 1)); // 随机取一个master的配置
+        $config = [
+            'host' => $this->configs['direct']['masters'][$randomMaster]['host'],
+            'port' => $this->configs['direct']['masters'][$randomMaster]['port'],
+            'password' = $this->configs['password']
+        ];
+        return $config;
+    }
+
+    /**
+     * 获取slave配置
+     */
+    public function getSlaveConfigs(){
+        if('sentinel' === $this->configs['type']){
+            return $this->getSlaveConfigsBySentinel();
+        }
+        if(0 === count($this->configs['direct']['slaves'])){ // 没有slave则取master
+            return $this->getMasterConfigs();
+        }
+        $randomSlave = rand(0, (count($this->configs['direct']['slaves']) - 1)); // 随机取一个slave的配置
+        $config = [
+            'host' => $this->configs['direct']['slaves'][$randomSlave]['host'],
+            'port' => $this->configs['direct']['slaves'][$randomSlave]['port'],
+            'password' = $this->configs['password']
+        ];
+        return $config;
+    }
+
+    /**
+     * 通过sentinel获取master配置
+     */
+    public function getMasterConfigsBySentinel(){
+        $masters = $this->sentinel->get_masters($this->masterName);
         $config = [
             'host' => $masters[0],
             'port' => $masters[1],
@@ -115,11 +132,14 @@ class Redis {
     }
 
     /**
-     * 获取配置
+     * 通过sentinel获取slave配置
      */
-    public function getSlaveConfigs($sentinel, $masterName){
-        $slaves = $sentinel->get_slaves($masterName);
-        $random = rand(0, (count($slaves) - 1)); //随机取一个slave的配置
+    public function getSlaveConfigsBySentinel($sentinel, $masterName){
+        $slaves = $this->sentinel->get_slaves($this->masterName);
+        if(0 === count($slaves)){ // 没有slave则取master
+            return $this->getMasterConfigsBySentinel();
+        }
+        $random = rand(0, (count($slaves) - 1)); // 随机取一个slave的配置
         $config = [
             'host' => $slaves[$random]['ip'],
             'port' => $slaves[$random]['port']
