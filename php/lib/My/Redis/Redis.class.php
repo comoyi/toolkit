@@ -160,6 +160,7 @@ class Redis {
     private function judge($command) {
         $masterOrSlave = 'master';
         $readOnlyCommands = [
+            'get',
             'hget',
             'hmget',
             'hgetall',
@@ -194,6 +195,22 @@ class Redis {
      */
     public function redis_eval ($script, $args, $quantity) {
         $result= $this->getHandler($this->judge(__FUNCTION__))->eval($script, $args, $quantity);
+        return $result;
+    }
+
+    /**
+     * 同redis手册
+     */
+    public function get($key){
+        $result= $this->getHandler($this->judge(__FUNCTION__))->get($key);
+        return $result;
+    }
+
+    /**
+     * 同redis手册
+     */
+    public function set($key){
+        $result= $this->getHandler($this->judge(__FUNCTION__))->set($key);
         return $result;
     }
 
