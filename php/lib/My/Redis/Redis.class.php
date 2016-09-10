@@ -217,104 +217,112 @@ class Redis {
     /**
      * 同redis手册
      */
-    public function setex($key, $seconds, $value){
-        $result= $this->getHandler($this->judge(__FUNCTION__))->setex($key, $seconds, $value);
+    public function setEx($key, $seconds, $value){
+        $result= $this->getHandler($this->judge(__FUNCTION__))->setEx($key, $seconds, $value);
         return $result;
     }
 
     /**
      * 同redis手册
      */
-    public function hget($key, $field){
-        $result= $this->getHandler($this->judge(__FUNCTION__))->hget($key, $field);
+    public function setNx($key, $value){
+        $result= $this->getHandler($this->judge(__FUNCTION__))->setNx($key, $value);
         return $result;
     }
 
     /**
      * 同redis手册
      */
-    public function hmget($key, $array){
-        $result= $this->getHandler($this->judge(__FUNCTION__))->hmget($key, $array);
+    public function hGet($key, $field){
+        $result= $this->getHandler($this->judge(__FUNCTION__))->hGet($key, $field);
         return $result;
     }
 
     /**
      * 同redis手册
      */
-    public function hgetall($key){
-        $result= $this->getHandler($this->judge(__FUNCTION__))->hgetall($key);
+    public function hMGet($key, $array){
+        $result= $this->getHandler($this->judge(__FUNCTION__))->hMGet($key, $array);
         return $result;
     }
 
     /**
      * 同redis手册
      */
-    public function hset($key, $field, $value){
-        $result= $this->getHandler($this->judge(__FUNCTION__))->hset($key, $field, $value);
+    public function hGetAll($key){
+        $result= $this->getHandler($this->judge(__FUNCTION__))->hGetAll($key);
         return $result;
     }
 
     /**
      * 同redis手册
      */
-    public function hmset($key, $array){
-        $result= $this->getHandler($this->judge(__FUNCTION__))->hmset($key, $array);
+    public function hSet($key, $field, $value){
+        $result= $this->getHandler($this->judge(__FUNCTION__))->hSet($key, $field, $value);
         return $result;
     }
 
     /**
      * 同redis手册
      */
-    public function sadd($key, $value){
-        $result= $this->getHandler($this->judge(__FUNCTION__))->sadd($key, $value);
+    public function hMSet($key, $array){
+        $result= $this->getHandler($this->judge(__FUNCTION__))->hMSet($key, $array);
         return $result;
     }
 
     /**
      * 同redis手册
      */
-    public function zadd($key, $score, $value){
-        $result= $this->getHandler($this->judge(__FUNCTION__))->zadd($key, $score, $value);
+    public function sAdd($key, $value){
+        $result= $this->getHandler($this->judge(__FUNCTION__))->sAdd($key, $value);
         return $result;
     }
 
     /**
      * 同redis手册
      */
-    public function smembers($key){
-        $result= $this->getHandler($this->judge(__FUNCTION__))->smembers($key);
+    public function zAdd($key, $score, $value){
+        $result= $this->getHandler($this->judge(__FUNCTION__))->zAdd($key, $score, $value);
         return $result;
     }
 
     /**
      * 同redis手册
      */
-    public function srem($key, $member){
-        $result= $this->getHandler($this->judge(__FUNCTION__))->srem($key, $member);
+    public function sMembers($key){
+        $result= $this->getHandler($this->judge(__FUNCTION__))->sMembers($key);
         return $result;
     }
 
     /**
      * 同redis手册
      */
-    public function zrange($key, $start, $stop){
-        $result= $this->getHandler($this->judge(__FUNCTION__))->zrange($key, $start, $stop);
+    public function sRem($key, $member){
+        $result= $this->getHandler($this->judge(__FUNCTION__))->sRem($key, $member);
         return $result;
     }
 
     /**
      * 同redis手册
      */
-    public function zrem($key, $member){
-        $result= $this->getHandler($this->judge(__FUNCTION__))->zrem($key, $member);
+    public function zRange($key, $start, $stop){
+        $result= $this->getHandler($this->judge(__FUNCTION__))->zRange($key, $start, $stop);
         return $result;
     }
 
     /**
      * 同redis手册
      */
-    public function zremrangebyscore($key, $min, $max){
-        $result= $this->getHandler($this->judge(__FUNCTION__))->zremrangebyscore($key, $min, $max);
+    public function zRem($key, $member){
+        $result= $this->getHandler($this->judge(__FUNCTION__))->zRem($key, $member);
+        return $result;
+    }
+
+    /**
+     * 同redis手册
+     */
+    public function zRemRangeByScore($key, $min, $max){
+        $result= $this->getHandler($this->judge(__FUNCTION__))->zRemRangeByScore($key, $min, $max);
         return $result;
     }
 
