@@ -133,7 +133,7 @@ class Redis {
     /**
      * 通过sentinel获取slave配置
      */
-    public function getSlaveConfigsBySentinel($sentinel, $masterName){
+    public function getSlaveConfigsBySentinel(){
         $slaves = $this->sentinel->get_slaves($this->masterName);
         if(0 === count($slaves)){ // 没有slave则取master
             return $this->getMasterConfigsBySentinel();
