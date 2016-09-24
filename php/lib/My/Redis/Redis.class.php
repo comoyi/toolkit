@@ -193,7 +193,7 @@ class Redis {
     /**
      * 同redis手册
      */
-    public function redisEval ($script, $args, $quantity) {
+    public function evaluate ($script, $args, $quantity) {
         $result= $this->getHandler($this->judge(__FUNCTION__))->eval($script, $args, $quantity);
         return $result;
     }
