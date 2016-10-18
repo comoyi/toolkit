@@ -161,11 +161,11 @@ class Redis {
         $masterOrSlave = 'master';
         $readOnlyCommands = [
             'get',
-            'hget',
-            'hmget',
-            'hgetall',
-            'smembers',
-            'zrange',
+            'hGet',
+            'hMGet',
+            'hGetAll',
+            'sMembers',
+            'zRange',
             'exists'
         ]; //只读的操作
        if (in_array($command, $readOnlyCommands)) {
@@ -175,15 +175,10 @@ class Redis {
     }
 
     /**
-     * 切换database
-     */
-    private function select($index = 0) {
-        $this->pool['master']->getHandler()->select($index);
-        $this->pool['slave']->getHandler()->select($index);
-    }
-
-    /**
      * 获取连接
+     *
+     * @param string $masterOrSlave [master / slave]
+     * @return
      */
     private function getHandler($masterOrSlave) {
        $handler = $this->pool[$masterOrSlave]->getHandler();
@@ -191,170 +186,339 @@ class Redis {
     }
 
     /**
-     * 同redis手册
+     * 切换database
+     *
+     * @param int $index db索引
+     */
+    public function select($index = 0) {
+        $this->pool['master']->getHandler()->select($index);
+        $this->pool['slave']->getHandler()->select($index);
+    }
+
+    /**
+     * 执行lua脚本
+     *
+     * eval是PHP关键字PHP7以下不能作为方法名
+     *
+     * @param string $script 脚本代码
+     * @param array $args 传给脚本的KEYS, ARGV组成的索引数组（不是key-value对应，是先KEYS再ARGV的索引数组，KEYS, ARGV数量可以不同） 例：['key1', 'key2', 'argv1', 'argv2', 'argv3']
+     * @param int $quantity 传给脚本的KEY数量
+     * @return
      */
     public function evaluate ($script, $args, $quantity) {
-        $result= $this->getHandler($this->judge(__FUNCTION__))->eval($script, $args, $quantity);
+        $result = $this->getHandler($this->judge(__FUNCTION__))->eval($script, $args, $quantity);
         return $result;
     }
 
     /**
-     * 同redis手册
+     * 获取key对应的值
+     *
+     * @param string $key key
+     * @return
      */
     public function get($key){
-        $result= $this->getHandler($this->judge(__FUNCTION__))->get($key);
+        $result = $this->getHandler($this->judge(__FUNCTION__))->get($key);
         return $result;
     }
 
     /**
-     * 同redis手册
+     * 设置key - value
+     *
+     * @param string $key key
+     * @param string $value value
+     * @return
      */
     public function set($key, $value){
-        $result= $this->getHandler($this->judge(__FUNCTION__))->set($key, $value);
+        $result = $this->getHandler($this->judge(__FUNCTION__))->set($key, $value);
         return $result;
     }
 
     /**
-     * 同redis手册
+     * 设置key - value同时设置剩余有效期
+     *
+     * @param string $key key
+     * @param int $seconds 剩余有效期 （单位：s / 秒）
+     * @param string $value
+     * @return
      */
     public function setEx($key, $seconds, $value){
-        $result= $this->getHandler($this->judge(__FUNCTION__))->setEx($key, $seconds, $value);
+        $result = $this->getHandler($this->judge(__FUNCTION__))->setEx($key, $seconds, $value);
         return $result;
     }
 
     /**
-     * 同redis手册
+     * 设置key - value （仅在当前key不存在时有效）
+     *
+     * @param string $key key
+     * @param string $value value
+     * @return
      */
     public function setNx($key, $value){
-        $result= $this->getHandler($this->judge(__FUNCTION__))->setNx($key, $value);
+        $result = $this->getHandler($this->judge(__FUNCTION__))->setNx($key, $value);
         return $result;
     }
 
     /**
-     * 同redis手册
+     * 获取hash一个指定字段的值
+     *
+     * @param string $key key
+     * @param string $field 字段
+     * @return
      */
     public function hGet($key, $field){
-        $result= $this->getHandler($this->judge(__FUNCTION__))->hGet($key, $field);
+        $result = $this->getHandler($this->judge(__FUNCTION__))->hGet($key, $field);
         return $result;
     }
 
     /**
-     * 同redis手册
+     * 获取hash多个指定字段的值
+     *
+     * @param string $key key
+     * @param array $array 字段索引数组
+     * @return
      */
     public function hMGet($key, $array){
-        $result= $this->getHandler($this->judge(__FUNCTION__))->hMGet($key, $array);
+        $result = $this->getHandler($this->judge(__FUNCTION__))->hMGet($key, $array);
         return $result;
     }
 
     /**
-     * 同redis手册
+     * 获取整个hash的值
+     *
+     * @param string $key key
+     * @return
      */
     public function hGetAll($key){
-        $result= $this->getHandler($this->judge(__FUNCTION__))->hGetAll($key);
+        $result = $this->getHandler($this->judge(__FUNCTION__))->hGetAll($key);
         return $result;
     }
 
     /**
-     * 同redis手册
+     * 设置hash一个字段
+     *
+     * @param string $key key
+     * @param string $field 字段
+     * @param string $value 值
+     * @return
      */
     public function hSet($key, $field, $value){
-        $result= $this->getHandler($this->judge(__FUNCTION__))->hSet($key, $field, $value);
+        $result = $this->getHandler($this->judge(__FUNCTION__))->hSet($key, $field, $value);
         return $result;
     }
 
     /**
-     * 同redis手册
+     * 设置hash多个字段
+     *
+     * @param string $key key
+     * @param array $array 要设置的hash字段 例：['field1' => 'value1', 'field2' => 'value2']
+     * @return
      */
     public function hMSet($key, $array){
-        $result= $this->getHandler($this->judge(__FUNCTION__))->hMSet($key, $array);
+        $result = $this->getHandler($this->judge(__FUNCTION__))->hMSet($key, $array);
         return $result;
     }
 
     /**
-     * 同redis手册
+     * 往set集合添加成员
+     *
+     * @param string $key key
+     * @param string $member 成员
+     * @return
      */
-    public function sAdd($key, $value){
-        $result= $this->getHandler($this->judge(__FUNCTION__))->sAdd($key, $value);
+    public function sAdd($key, $member){
+        $result = $this->getHandler($this->judge(__FUNCTION__))->sAdd($key, $member);
         return $result;
     }
 
     /**
-     * 同redis手册
-     */
-    public function zAdd($key, $score, $value){
-        $result= $this->getHandler($this->judge(__FUNCTION__))->zAdd($key, $score, $value);
-        return $result;
-    }
-
-    /**
-     * 同redis手册
+     * 获取集合所有成员
+     *
+     * @param string $key key
+     * @return
      */
     public function sMembers($key){
-        $result= $this->getHandler($this->judge(__FUNCTION__))->sMembers($key);
+        $result = $this->getHandler($this->judge(__FUNCTION__))->sMembers($key);
         return $result;
     }
 
     /**
-     * 同redis手册
+     * 删除集合里的成员
+     *
+     * @param string $key key
+     * @param string $member 成员
+     * @return
      */
     public function sRem($key, $member){
-        $result= $this->getHandler($this->judge(__FUNCTION__))->sRem($key, $member);
+        $result = $this->getHandler($this->judge(__FUNCTION__))->sRem($key, $member);
         return $result;
     }
 
     /**
-     * 同redis手册
+     * 往有序集合添加成员
+     *
+     * @param string $key key
+     * @param int $score score
+     * @param string $value value
+     * @return
      */
-    public function zRange($key, $start, $stop){
-        $result= $this->getHandler($this->judge(__FUNCTION__))->zRange($key, $start, $stop);
+    public function zAdd($key, $score, $value){
+        $result = $this->getHandler($this->judge(__FUNCTION__))->zAdd($key, $score, $value);
         return $result;
     }
 
     /**
-     * 同redis手册
+     * 获取有序集合成员
+     *
+     * @param string $key key
+     * @param int $start 起始值
+     * @param int $stop 截止值
+     * @param bool $isWithScore 是否包含score值
+     * @return
      */
-    public function zRem($key, $member){
-        $result= $this->getHandler($this->judge(__FUNCTION__))->zRem($key, $member);
+    public function zRange($key, $start, $stop, $isWithScore = false){
+        $result = $this->getHandler($this->judge(__FUNCTION__))->zRange($key, $start, $stop, $isWithScore);
         return $result;
     }
 
     /**
-     * 同redis手册
+     * 根据value移除有序集合成员
+     * @param string $key key
+     * @param string $value value值
+     * @return
+     */
+    public function zRem($key, $value){
+        $result = $this->getHandler($this->judge(__FUNCTION__))->zRem($key, $value);
+        return $result;
+    }
+
+    /**
+     * 根据排名范围移除有序集合成员
+     *
+     * @param string $key key
+     * @param int $start 起始排名
+     * @param int $stop 截止排名
+     * @return
+     */
+    public function zRemRangeByRank($key, $start, $stop){
+        $result = $this->getHandler($this->judge(__FUNCTION__))->zRemRangeByRank($key, $start, $stop);
+        return $result;
+    }
+
+    /**
+     * 根据score范围移除有序集合成员
+     *
+     * @param string $key key
+     * @param int $min 起始score
+     * @param int $max 截止score
+     * @return
      */
     public function zRemRangeByScore($key, $min, $max){
-        $result= $this->getHandler($this->judge(__FUNCTION__))->zRemRangeByScore($key, $min, $max);
+        $result = $this->getHandler($this->judge(__FUNCTION__))->zRemRangeByScore($key, $min, $max);
         return $result;
     }
 
     /**
-     * 同redis手册
+     * 设置剩余有效时长
+     *
+     * @param string $key key
+     * @param int $exp 剩余时长 （单位：秒）
+     * @return
      */
     public function expire($key, $exp){
-        $result= $this->getHandler($this->judge(__FUNCTION__))->expire($key, $exp);
+        $result = $this->getHandler($this->judge(__FUNCTION__))->expire($key, $exp);
         return $result;
     }
 
     /**
-     * 同redis手册
+     * 删除key
+     *
+     * @param string $key key
+     * @return
      */
     public function del($key){
-        $result= $this->getHandler($this->judge(__FUNCTION__))->del($key);
+        $result = $this->getHandler($this->judge(__FUNCTION__))->del($key);
         return $result;
     }
 
     /**
-     * 同redis手册
+     * 判断key是否存在
+     *
+     * @param $key
+     * @return
      */
     public function exists($key){
-        $result= $this->getHandler($this->judge(__FUNCTION__))->exists($key);
+        $result = $this->getHandler($this->judge(__FUNCTION__))->exists($key);
         return $result;
     }
 
     /**
-     * 同redis手册
+     * 发布消息到指定频道
+     * @param string $channel 频道
+     * @param string $message 消息内容
+     * @return
      */
     public function publish($channel, $message){
-        $result= $this->getHandler($this->judge(__FUNCTION__))->publish($channel, $message);
+        $result = $this->getHandler($this->judge(__FUNCTION__))->publish($channel, $message);
+        return $result;
+    }
+
+    /**
+     * 自增 - 增幅为1
+     *
+     * @param string $key key
+     * @return
+     */
+    public function incr($key) {
+        $result = $this->getHandler($this->judge(__FUNCTION__))->incr($key);
+        return $result;
+    }
+
+    /**
+     * 自增 - 增幅为指定值
+     *
+     * @param string $key key
+     * @param int $amount 增加的数值
+     * @return
+     */
+    public function incrBy($key, $amount) {
+        $result = $this->getHandler($this->judge(__FUNCTION__))->incrBy($key, $amount);
+        return $result;
+    }
+
+    /**
+     * 添加到队列头
+     *
+     * @param string $key key
+     * @param string $value value
+     * @return
+     */
+    public function lPush($key, $value) {
+        $result = $this->getHandler($this->judge(__FUNCTION__))->lPush($key, $value);
+        return $result;
+    }
+
+    /**
+     * 添加到队列尾
+     *
+     * @param string $key key
+     * @param string $value value
+     * @return
+     */
+    public function rPush($key, $value) {
+        $result = $this->getHandler($this->judge(__FUNCTION__))->rPush($key, $value);
+        return $result;
+    }
+
+    /**
+     * 增加有序集合score值
+     *
+     * @param string $key key
+     * @param int $amount 增长的数值
+     * @param string $value value值
+     * @return
+     */
+    public function zIncrBy($key, $amount, $value) {
+        $result = $this->getHandler($this->judge(__FUNCTION__))->zIncrBy($key, $amount, $value);
         return $result;
     }
 
