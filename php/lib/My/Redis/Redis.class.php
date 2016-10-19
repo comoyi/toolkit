@@ -236,7 +236,7 @@ class Redis {
      *
      * @param string $key key
      * @param string $value value
-     * @param array $opt 可选参数  可选参数可以自由组合 nx: key不存在时有效, xx: key存在时有效, ex: ttl[单位：秒/s], px: ttl[单位：毫秒/ms]
+     * @param array $opt 可选参数  可选参数可以自由组合 nx: key不存在时有效, xx: key存在时有效, ex: ttl[单位：s], px: ttl[单位：ms]
      * @return
      */
     public function set($key, $value, $opt = null){
