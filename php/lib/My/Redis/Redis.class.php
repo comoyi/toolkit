@@ -342,7 +342,7 @@ class Redis {
     }
 
     /**
-     * 删除集合里的成员
+     * 从集合中移除指定的成员
      *
      * @param string $key key
      * @param string $member 成员
@@ -367,7 +367,7 @@ class Redis {
     }
 
     /**
-     * 获取有序集合成员
+     * 从有序集合获取指定范围内的成员
      *
      * @param string $key key
      * @param int $start 起始值
@@ -381,22 +381,22 @@ class Redis {
     }
 
     /**
-     * 根据value移除有序集合成员
+     * 从有序集合移除指定的成员
      * @param string $key key
-     * @param string $value value值
+     * @param string $member 成员
      * @return
      */
-    public function zRem($key, $value){
-        $result = $this->getHandler($this->judge(__FUNCTION__))->zRem($key, $value);
+    public function zRem($key, $member){
+        $result = $this->getHandler($this->judge(__FUNCTION__))->zRem($key, $member);
         return $result;
     }
 
     /**
-     * 根据排名范围移除有序集合成员
+     * 从有序集合中移除指定排名范围内的成员
      *
      * @param string $key key
-     * @param int $start 起始排名
-     * @param int $stop 截止排名
+     * @param int $start 起始排名 （包含） 从0开始
+     * @param int $stop 截止排名 （包含） 从0开始
      * @return
      */
     public function zRemRangeByRank($key, $start, $stop){
@@ -405,11 +405,11 @@ class Redis {
     }
 
     /**
-     * 根据score范围移除有序集合成员
+     * 从有序集合中移除指定score范围内的成员
      *
      * @param string $key key
-     * @param int $min 起始score
-     * @param int $max 截止score
+     * @param int $min 起始score （包含）
+     * @param int $max 截止score （包含）
      * @return
      */
     public function zRemRangeByScore($key, $min, $max){
