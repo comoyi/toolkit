@@ -224,12 +224,23 @@ class Redis {
     /**
      * 设置key - value
      *
+     * set('key', 'value');
+     * set('key', 'value', ['nx']);
+     * set('key', 'value', ['xx']);
+     * set('key', 'value', ['ex' => 10]);
+     * set('key', 'value', ['px' => 1000]);
+     * set('key', 'value', ['nx', 'ex' => 10]);
+     * set('key', 'value', ['nx', 'px' => 1000]);
+     * set('key', 'value', ['xx', 'ex' => 10]);
+     * set('key', 'value', ['xx', 'px' => 1000]);
+     *
      * @param string $key key
      * @param string $value value
+     * @param array $opt 可选参数  可选参数可以自由组合 nx: key不存在时有效, xx: key存在时有效, ex: ttl[单位：秒/s], px: ttl[单位：毫秒/ms]
      * @return
      */
-    public function set($key, $value){
-        $result = $this->getHandler($this->judge(__FUNCTION__))->set($key, $value);
+    public function set($key, $value, $opt = null){
+        $result = $this->getHandler($this->judge(__FUNCTION__))->set($key, $value, $opt);
         return $result;
     }
 
