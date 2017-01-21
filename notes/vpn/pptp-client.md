@@ -1,11 +1,11 @@
 ## steps for use vpn
 
-### install
+#### install
 ```
 sudo yum -y install pptp pptp-setup
 ```
 
-### stop firewall or set iptables
+#### stop firewall or set iptables
 ```
 systemctl stop firewalld.service
 
@@ -14,18 +14,18 @@ systemctl stop firewalld.service
 sudo iptables -I INPUT -p gre -j ACCEPT
 ```
 
-### copy script
+#### copy script
 ```
 sudo cp /usr/share/doc/ppp-2.4.5/scripts/pon /usr/sbin/
 sudo cp /usr/share/doc/ppp-2.4.5/scripts/poff /usr/sbin/
 ```
 
-### setup vpn config
+#### setup vpn config
 ```
 sudo pptpsetup --create <tunnel-name> --server <server> --username <username> --password <password> --encrypt
 ```
 
-### start vpn
+#### start vpn
 ```
 sudo pon <tunnel-name>
 ```
@@ -35,7 +35,7 @@ sudo pon <tunnel-name>
 sudo route add -net 192.168.11.0 netmask 255.255.255.0 dev ppp0
 ```
 
-### stop vpn
+#### stop vpn
 ```
 sudo poff <tunnel-name>
 ```
