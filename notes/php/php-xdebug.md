@@ -59,7 +59,6 @@ Run->Start Listening for PHP Debug Connections
 #### 查看端口状态
 ```
 netstat -tunpl
-
 ```
 
 #### 打断点
