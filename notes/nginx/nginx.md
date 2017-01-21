@@ -8,8 +8,6 @@ nginx -t
 nginx -s reload
 ```
 
----
-
 ```
 server {
     listen       80;
